@@ -1,0 +1,197 @@
+# Networks
+networks:
+  p2506_network:
+    driver: bridge
+
+# Volumes
+volumes:
+  mysql_data:
+  mosquitto_data:
+  mosquitto_log:
+
+# Services
+services:
+
+  # 1. MOSQUITTO (MQTT Broker)
+  mosquitto:
+
+    image: eclipse-mosquitto:2.0.18
+    container_name: mosquitto
+    restart: unless-stopped
+
+    environment:
+      TZ: Asia/Kolkata
+
+    ports:
+      - "1883:1883"
+      - "9001:9001"       
+    
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+
+    networks:
+      - p2506_network
+
+  # 2. MYSQL (Database)
+  mysql:
+
+    image: mysql:8.4
+    container_name: mysql
+    restart: unless-stopped
+    command: --default-time-zone=+05:30
+
+    environment:
+      TZ: Asia/Kolkata
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d:ro
+    
+    networks:
+      - p2506_network
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # 3. NODE-RED (MQTT → MySQL)
+  nodered:
+
+    image: nodered/node-red:4.1.10-20
+    container_name: nodered
+    restart: unless-stopped
+    
+    environment:
+      TZ: Asia/Kolkata
+      NODE_RED_CREDENTIAL_SECRET: ${NODE_RED_CREDENTIAL_SECRET}
+    
+    ports:
+      - "1880:1880"
+    
+    volumes:
+      - ./node-red/data:/data
+    
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mosquitto:
+        condition: service_started
+    
+    networks:
+      - p2506_network   
+
+  # 4. ALERT MANAGER (Anomaly Detection → MySQL)
+  alert-manager:
+
+    image: parilpaladiya/alert-manager:1.1
+    container_name: alert-manager
+    restart: unless-stopped
+    
+    environment:
+      TZ: Asia/Kolkata
+      MQTT_BROKER: ${MQTT_BROKER}
+      MQTT_PORT: ${MQTT_PORT}
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      TEMP_NORMAL_MAX: ${TEMP_NORMAL_MAX}
+      TEMP_WARNING_MAX: ${TEMP_WARNING_MAX}
+      ANOMALY_STD_MULT: ${ANOMALY_STD_MULT}
+      ANOMALY_REPEAT: ${ANOMALY_REPEAT}
+      WINDOW_SIZE: ${WINDOW_SIZE}
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mosquitto:  
+        condition: service_started
+    
+    networks:
+      - p2506_network
+
+  # 5. ALERT API (Flask REST API)
+  alert-api:
+
+    image: parilpaladiya/alert-api:1.2
+    container_name: alert-api
+    restart: unless-stopped
+    
+    environment:
+      TZ: Asia/Kolkata
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    
+    ports:
+      - "5000:5000"
+    
+    depends_on:
+      mysql:
+        condition: service_healthy
+    
+    networks:
+      - p2506_network
+
+  # 6. DATA GENERATOR (Simulated IoT devices)
+  data-generator:
+
+    image: parilpaladiya/data-generator:1.1
+    container_name: data-generator
+    restart: unless-stopped
+    
+    environment:
+      TZ: Asia/Kolkata
+      MQTT_BROKER: ${MQTT_BROKER}
+      MQTT_PORT: ${MQTT_PORT}
+      DATA_INTERVAL: ${DATA_INTERVAL}
+    
+    depends_on:
+      mosquitto:
+        condition: service_started
+    
+    networks:
+      - p2506_network
+
+  # 7. GRAFANA (Dashboard)
+  grafana:
+    image: grafana/grafana:12.4.3-security-02
+    container_name: grafana
+    restart: unless-stopped
+    
+    environment:
+      TZ: Asia/Kolkata
+      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
+      GF_DATE_FORMATS_DEFAULT_TIMEZONE: Asia/Kolkata
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      GF_PLUGINS_PREINSTALL: grafana-mqtt-datasource,marcusolsson-json-datasource
+    
+    ports:
+      - "3000:3000"
+    
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    
+    depends_on:
+      mysql:
+        condition: service_healthy
+      alert-api:
+        condition: service_started
+    
+    networks:
+      - p2506_network

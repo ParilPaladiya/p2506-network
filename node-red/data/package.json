@@ -1,0 +1,8 @@
+{
+    "name": "node-red-iot-project",
+    "description": "IoT sensor pipeline: MQTT → MySQL",
+    "version": "1.0.0",
+    "dependencies": {
+        "node-red-node-mysql": "~3.0.0"
+    }
+}

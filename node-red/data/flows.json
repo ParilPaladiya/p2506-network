@@ -1,0 +1,117 @@
+[
+    {
+        "id": "flow1",
+        "type": "tab",
+        "label": "IoT MQTT → MySQL",
+        "disabled": false,
+        "info": "Subscribes to all 3 device topics and inserts into temperature_data"
+    },
+    {
+        "id": "mqtt-broker-config",
+        "type": "mqtt-broker",
+        "name": "Mosquitto (Docker)",
+        "broker": "mosquitto",
+        "port": "1883",
+        "clientid": "nodered-client",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "mysql-config",
+        "type": "MySQLdatabase",
+        "name": "sensor_db (Docker)",
+        "host": "mysql",
+        "port": "3306",
+        "db": "sensor_db",
+        "tz": "",
+        "charset": "UTF8"
+    },
+    {
+        "id": "mqtt-in-node",
+        "type": "mqtt in",
+        "z": "flow1",
+        "name": "MQTT All Devices",
+        "topic": "sensor/+/temperature",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "mqtt-broker-config",
+        "nl": false,
+        "rap": false,
+        "rh": 0,
+        "inputs": 0,
+        "x": 160,
+        "y": 160,
+        "wires": [
+            [
+                "function-node"
+            ]
+        ]
+    },
+    {
+        "id": "function-node",
+        "type": "function",
+        "z": "flow1",
+        "name": "Parse & Build SQL",
+        "func": "let data = msg.payload;\n\nif (typeof data === 'string') {\n    data = JSON.parse(data);\n}\n\nlet temperature = Number(data.temperature);\nlet topicParts = msg.topic.split('/');\nlet device_id = topicParts[1];\n\nmsg.topic =\n    \"INSERT INTO temperature_data (device_id, temperature) VALUES ('\" +\n    device_id + \"', \" + temperature + \")\";\n\nmsg.payload = {\n    device_id: device_id,\n    temperature: temperature\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 160,
+        "wires": [
+            [
+                "mysql-node",
+                "debug-node"
+            ]
+        ]
+    },
+    {
+        "id": "mysql-node",
+        "type": "mysql",
+        "z": "flow1",
+        "mydb": "mysql-config",
+        "name": "Insert temperature_data",
+        "x": 650,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "debug-node",
+        "type": "debug",
+        "z": "flow1",
+        "name": "Debug Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 200,
+        "wires": []
+    }
+]
