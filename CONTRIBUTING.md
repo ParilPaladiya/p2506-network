@@ -35,7 +35,7 @@ docker-compose logs -f nodered
   - `README.md`
   - `CONTRIBUTING.md`
   - `docs/`
-  - `mysql/init/init.sql`
+  - `postgres/init/01-schema.sql`
   - `node-red/data/flows.json`
   - `node-red/data/settings.js`
   - `node-red/data/package.json`
@@ -63,7 +63,7 @@ docker-compose logs -f nodered
 - Use Grafana at `http://localhost:3000`.
 - Shared dashboards belong in `grafana/provisioning/dashboards/`.
 - Local UI state under `grafana/data/` is intentionally non-shareable.
-- If you want to update the shared dashboard, export the dashboard JSON and replace `grafana/provisioning/dashboards/api-mysql-dashboard.json`.
+- If you want to update the shared dashboard, export the dashboard JSON and replace the provisioned file in `grafana/provisioning/dashboards/`.
 
 ## Published Image Workflow
 
@@ -90,7 +90,7 @@ docker build -t <registry>/data-generator:<tag> ./data-generator
 ## Review Checklist Before Sharing Changes
 
 - `docker-compose up -d` starts cleanly.
-- `docker-compose ps` shows MySQL healthy.
+- `docker-compose ps` shows PostgreSQL healthy.
 - Node-RED flows are reflected in `node-red/data/flows.json`.
 - Grafana shareable changes are reflected in `grafana/provisioning/`.
 - No local runtime state was accidentally added to the commit.

@@ -1,11 +1,11 @@
 # P2506 Network IoT Monitoring Stack
 
-Docker Compose-based IoT monitoring setup with MQTT ingestion, MySQL storage, anomaly detection, a Flask alert API, Node-RED processing, and Grafana dashboards.
+Docker Compose-based IoT monitoring setup with MQTT ingestion, PostgreSQL storage, anomaly detection, a Flask alert API, Node-RED processing, and Grafana dashboards.
 
 ## What This Repo Contains
 
 - MQTT broker with Mosquitto
-- MySQL database with bootstrap schema
+- PostgreSQL database with bootstrap schema
 - Node-RED flow that stores raw sensor data
 - Alert manager that classifies readings and stores alerts
 - Alert API for querying alert history
@@ -23,7 +23,7 @@ Docker Compose-based IoT monitoring setup with MQTT ingestion, MySQL storage, an
         (raw temperature data)      (anomaly detection)
                 |                           |
                 v                           v
-      [MySQL: temperature_data]   [MySQL: temperature_alerts]
+   [PostgreSQL: temperature_data] [PostgreSQL: temperature_alerts]
                                                 |
                                                 v
                                          [Alert API]
@@ -43,8 +43,8 @@ p2506-network/
 |   `-- SHARING.md
 |-- mosquitto/
 |   `-- config/mosquitto.conf
-|-- mysql/
-|   `-- init/init.sql
+|-- postgres/
+|   `-- init/01-schema.sql
 |-- data-generator/          # source for published data-generator image
 |-- alert-manager/           # source for published alert-manager image
 |-- alert-api/               # source for published alert-api image
@@ -94,7 +94,7 @@ docker-compose ps
 | Service | Port | URL |
 |---|---:|---|
 | Mosquitto MQTT | 1883 | `mqtt://localhost:1883` |
-| MySQL | 3306 | `localhost:3306` |
+| PostgreSQL | 5432 | `localhost:5432` |
 | Node-RED | 1880 | `http://localhost:1880` |
 | Alert API | 5000 | `http://localhost:5000` |
 | Grafana | 3000 | `http://localhost:3000` |
@@ -103,7 +103,8 @@ docker-compose ps
 
 - Grafana username: `admin`
 - Grafana password: `admin`
-- MySQL root password: `qwerty`
+- PostgreSQL password: `qwerty`
+- PostgreSQL user: `postgres`
 
 Change them in `.env` when needed.
 
@@ -116,7 +117,7 @@ All services are configured to use `Asia/Kolkata` (IST, UTC+05:30).
 ### Shareable Source of Truth
 
 - `docker-compose.yaml`
-- `mysql/init/init.sql`
+- `postgres/init/01-schema.sql`
 - `node-red/data/flows.json`
 - `node-red/data/settings.js`
 - `node-red/data/package.json`
@@ -136,8 +137,8 @@ Do not use local runtime state as the shareable version of the project.
 ## Grafana
 
 - Shared Grafana assets live in `grafana/provisioning/`.
-- The shared dashboard file is `grafana/provisioning/dashboards/api-mysql-dashboard.json`.
-- The provisioning config now keeps that dashboard file-managed so contributors all start from the same version.
+- The shared dashboard file is provisioned from `grafana/provisioning/dashboards/`.
+- The provisioning config keeps the dashboard file managed so contributors all start from the same version.
 - If you want to update the shared dashboard, export the dashboard JSON and replace the provisioned file.
 
 ## Node-RED
@@ -189,8 +190,8 @@ curl http://localhost:5000/health
 
 | Problem | Fix |
 |---|---|
-| MySQL not ready errors | Wait for the MySQL healthcheck; dependent services retry automatically |
-| Node-RED cannot connect to MySQL | Check host `mysql`, port `3306`, database `sensor_db`, and configured credentials |
+| PostgreSQL not ready errors | Wait for the PostgreSQL healthcheck; dependent services retry automatically |
+| Node-RED cannot connect to PostgreSQL | Check host `postgres`, port `5432`, database `sensor_db`, and configured credentials |
 | Contributors do not see the shared dashboard | Restart Grafana and verify the dashboard JSON in `grafana/provisioning/dashboards/` |
 | Port already in use | Change the host-side port in `docker-compose.yaml` |
 
