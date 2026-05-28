@@ -37,7 +37,7 @@ For the easiest onboarding flow:
 1. Share the Git repository.
 2. Tell contributors to copy `.env.example` to `.env`.
 3. Tell them to run `docker-compose up -d`.
-4. Tell them to wait for MySQL health to turn green in `docker-compose ps`.
+4. Tell them to wait for PostgreSQL health to turn green in `docker-compose ps`.
 5. Tell them to open:
    - Grafana: `http://localhost:3000`
    - Node-RED: `http://localhost:1880`
