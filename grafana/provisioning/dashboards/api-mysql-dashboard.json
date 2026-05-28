@@ -23,8 +23,8 @@
   "panels": [
     {
       "datasource": {
-        "type": "mysql",
-        "uid": "mysql-sensor-uid"
+        "type": "postgres",
+        "uid": "postgres-sensor-uid"
       },
       "fieldConfig": {
         "defaults": {
@@ -127,8 +127,8 @@
         {
           "dataset": "sensor_db",
           "datasource": {
-            "type": "mysql",
-            "uid": "mysql-sensor-uid"
+            "type": "postgres",
+            "uid": "postgres-sensor-uid"
           },
           "editorMode": "code",
           "format": "table",
@@ -156,8 +156,8 @@
         {
           "dataset": "sensor_db",
           "datasource": {
-            "type": "mysql",
-            "uid": "mysql-sensor-uid"
+            "type": "postgres",
+            "uid": "postgres-sensor-uid"
           },
           "editorMode": "code",
           "format": "table",
@@ -183,13 +183,13 @@
           }
         }
       ],
-      "title": "Sate Timeline (MySQL)",
+      "title": "State Timeline (PostgreSQL)",
       "type": "state-timeline"
     },
     {
       "datasource": {
-        "type": "mysql",
-        "uid": "mysql-sensor-uid"
+        "type": "postgres",
+        "uid": "postgres-sensor-uid"
       },
       "fieldConfig": {
         "defaults": {
@@ -248,8 +248,8 @@
         {
           "dataset": "sensor_db",
           "datasource": {
-            "type": "mysql",
-            "uid": "mysql-sensor-uid"
+            "type": "postgres",
+            "uid": "postgres-sensor-uid"
           },
           "editorMode": "code",
           "format": "table",
@@ -275,13 +275,13 @@
           }
         }
       ],
-      "title": "D001 (MySQL)",
+      "title": "D001 (PostgreSQL)",
       "type": "gauge"
     },
     {
       "datasource": {
-        "type": "mysql",
-        "uid": "mysql-sensor-uid"
+        "type": "postgres",
+        "uid": "postgres-sensor-uid"
       },
       "fieldConfig": {
         "defaults": {
@@ -368,8 +368,8 @@
     },
     {
       "datasource": {
-        "type": "mysql",
-        "uid": "mysql-sensor-uid"
+        "type": "postgres",
+        "uid": "postgres-sensor-uid"
       },
       "fieldConfig": {
         "defaults": {
@@ -867,9 +867,9 @@
   },
   "timepicker": {},
   "timezone": "Asia/Kolkata",
-  "title": "API + MySQL Dashboard",
-  "weekStart": "",
-  "uid": "api-mysql-dashboard",
+      "title": "API + PostgreSQL Dashboard",
+      "weekStart": "",
+  "uid": "api-postgres-dashboard",
   "id": null,
   "version": 1
 }
