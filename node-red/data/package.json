@@ -1,8 +1,8 @@
 {
     "name": "node-red-iot-project",
-    "description": "IoT sensor pipeline: MQTT → MySQL",
+    "description": "IoT sensor pipeline: MQTT -> PostgreSQL",
     "version": "1.0.0",
     "dependencies": {
-        "node-red-node-mysql": "~3.0.0"
+        "node-red-contrib-postgresql": "~0.15.4"
     }
 }

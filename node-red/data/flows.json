@@ -2,7 +2,7 @@
     {
         "id": "flow1",
         "type": "tab",
-        "label": "IoT MQTT → MySQL",
+        "label": "IoT MQTT -> PostgreSQL",
         "disabled": false,
         "info": "Subscribes to all 3 device topics and inserts into temperature_data"
     },
@@ -35,14 +35,25 @@
         "sessionExpiry": ""
     },
     {
-        "id": "mysql-config",
-        "type": "MySQLdatabase",
+        "id": "postgres-config",
+        "type": "postgreSQLConfig",
         "name": "sensor_db (Docker)",
-        "host": "mysql",
-        "port": "3306",
-        "db": "sensor_db",
-        "tz": "",
-        "charset": "UTF8"
+        "host": "postgres",
+        "hostFieldType": "str",
+        "port": "5432",
+        "portFieldType": "num",
+        "database": "sensor_db",
+        "databaseFieldType": "str",
+        "ssl": "false",
+        "sslFieldType": "bool",
+        "max": "10",
+        "maxFieldType": "num",
+        "idle": "1000",
+        "idleFieldType": "num",
+        "connectionTimeout": "10000",
+        "connectionTimeoutFieldType": "num",
+        "user": "postgres",
+        "userFieldType": "str"
     },
     {
         "id": "mqtt-in-node",
@@ -70,7 +81,7 @@
         "type": "function",
         "z": "flow1",
         "name": "Parse & Build SQL",
-        "func": "let data = msg.payload;\n\nif (typeof data === 'string') {\n    data = JSON.parse(data);\n}\n\nlet temperature = Number(data.temperature);\nlet topicParts = msg.topic.split('/');\nlet device_id = topicParts[1];\n\nmsg.topic =\n    \"INSERT INTO temperature_data (device_id, temperature) VALUES ('\" +\n    device_id + \"', \" + temperature + \")\";\n\nmsg.payload = {\n    device_id: device_id,\n    temperature: temperature\n};\n\nreturn msg;",
+        "func": "let data = msg.payload;\n\nif (typeof data === 'string') {\n    data = JSON.parse(data);\n}\n\nlet temperature = Number(data.temperature);\nlet topicParts = msg.topic.split('/');\nlet device_id = topicParts[1];\n\nmsg.queryParameters = {\n    device_id: device_id,\n    temperature: temperature\n};\n\nmsg.payload = {\n    device_id: device_id,\n    temperature: temperature\n};\n\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -80,17 +91,21 @@
         "y": 160,
         "wires": [
             [
-                "mysql-node",
+                "postgres-node",
                 "debug-node"
             ]
         ]
     },
     {
-        "id": "mysql-node",
-        "type": "mysql",
+        "id": "postgres-node",
+        "type": "postgresql",
         "z": "flow1",
-        "mydb": "mysql-config",
+        "query": "INSERT INTO temperature_data (device_id, temperature) VALUES ($device_id, $temperature);",
+        "postgreSQLConfig": "postgres-config",
         "name": "Insert temperature_data",
+        "split": false,
+        "rowsPerMsg": "1",
+        "outputs": 1,
         "x": 650,
         "y": 120,
         "wires": [
