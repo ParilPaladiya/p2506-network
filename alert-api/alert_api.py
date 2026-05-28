@@ -1,24 +1,28 @@
 import os
-from flask import Flask, jsonify
-import mysql.connector
 from datetime import datetime
+
+import psycopg2
+from flask import Flask, jsonify
+from psycopg2.extras import RealDictCursor
 
 app = Flask(__name__)
 
-MYSQL_HOST = os.getenv("MYSQL_HOST", "localhost")
-MYSQL_USER = os.getenv("MYSQL_USER", "root")
-MYSQL_PASS = os.getenv("MYSQL_ROOT_PASSWORD")
-MYSQL_DB = os.getenv("MYSQL_DATABASE", "sensor_db")
+POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
+POSTGRES_PORT = int(os.getenv("POSTGRES_PORT", 5432))
+POSTGRES_USER = os.getenv("POSTGRES_USER", "postgres")
+POSTGRES_PASS = os.getenv("POSTGRES_PASSWORD")
+POSTGRES_DB = os.getenv("POSTGRES_DATABASE", "sensor_db")
 
 
 def fetch_data(device_id, order):
-    db = mysql.connector.connect(
-        host=MYSQL_HOST,
-        user=MYSQL_USER,
-        password=MYSQL_PASS,
-        database=MYSQL_DB
+    db = psycopg2.connect(
+        host=POSTGRES_HOST,
+        port=POSTGRES_PORT,
+        user=POSTGRES_USER,
+        password=POSTGRES_PASS,
+        dbname=POSTGRES_DB,
     )
-    cursor = db.cursor(dictionary=True)
+    cursor = db.cursor(cursor_factory=RealDictCursor)
     query = f"""
     SELECT device_id, temperature, alert_level, timestamp
     FROM temperature_alerts
@@ -43,7 +47,7 @@ def home():
     return jsonify({"status": "running", "message": "Grafana JSON API is ready"})
 
 
-# Latest reading (for gauge) — DESC
+# Latest reading (for gauge) - DESC
 @app.route("/alert/<device_id>", methods=["GET"])
 def alert_latest(device_id):
     return jsonify(fetch_data(device_id, "DESC"))
@@ -53,6 +57,7 @@ def alert_latest(device_id):
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "ok"})
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
