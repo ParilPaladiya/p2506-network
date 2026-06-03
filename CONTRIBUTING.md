@@ -1,6 +1,7 @@
 # Contributing Guide
 
 This project is shared as a Docker Compose stack. Contributors should be able to clone the repository, create a local `.env`, and start the full system without installing Python or Node.js locally.
+The intended first-boot experience is a clean clone plus `.env` copy plus `docker-compose up -d`, which should restore the committed Node-RED flow and Grafana dashboard automatically.
 
 ## Development Model
 

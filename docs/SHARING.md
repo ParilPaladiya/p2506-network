@@ -13,6 +13,7 @@ Use this repository as the single source of truth for:
 - source code for services that may later be rebuilt and republished
 
 For a fresh clone, the default startup state should match the committed Node-RED flow in `node-red/data/flows.json` and the committed Grafana dashboard in `grafana/provisioning/dashboards/api-postgres-dashboard.json`.
+That means contributors should only need to copy `.env.example` to `.env` and run `docker-compose up -d`.
 
 Do not use your live local runtime folders as the source of truth.
 
@@ -44,6 +45,8 @@ For the easiest onboarding flow:
    - Grafana: `http://localhost:3000`
    - Node-RED: `http://localhost:1880`
    - Alert API: `http://localhost:5000/health`
+
+On first boot, the repo should provision the same shared Node-RED flow and Grafana dashboard that are already committed.
 
 ## Important Runtime-State Rules
 

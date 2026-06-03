@@ -1,6 +1,7 @@
 # P2506 Network IoT Monitoring Stack
 
 Docker Compose-based IoT monitoring setup with MQTT ingestion, PostgreSQL storage, anomaly detection, a Flask alert API, Node-RED processing, and Grafana dashboards.
+For a fresh clone, the only setup step should be copying `.env.example` to `.env` and running `docker-compose up -d`.
 
 ## What This Repo Contains
 
@@ -133,6 +134,7 @@ All services are configured to use `Asia/Kolkata` (IST, UTC+05:30).
 - `grafana/data/`
 
 Do not use local runtime state as the shareable version of the project.
+If you clone the repo and use `.env.example`, the tracked Node-RED flow and Grafana provisioning files will recreate the same baseline setup on first boot.
 
 ## Grafana
 
