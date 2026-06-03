@@ -3,6 +3,6 @@
     "description": "IoT sensor pipeline: MQTT -> PostgreSQL",
     "version": "1.0.0",
     "dependencies": {
-        "node-red-contrib-postgresql": "~0.15.4"
+        "node-red-contrib-postgresql": "^0.15.4"
     }
 }

@@ -7,7 +7,9 @@ This project is shared as a Docker Compose stack. Contributors should be able to
 - `docker-compose.yaml` is the main entrypoint for running the stack.
 - `alert-manager`, `alert-api`, and `data-generator` are source folders for published images.
 - `node-red/data/flows.json` and `node-red/data/settings.js` are the shareable Node-RED sources.
+- `node-red/data/flows.json` is the current shared flow and should continue to represent the initial MQTT -> PostgreSQL setup.
 - `grafana/provisioning/` is the shareable Grafana source of truth.
+- `grafana/provisioning/dashboards/api-postgres-dashboard.json` is the shared PostgreSQL dashboard that contributors should start with.
 - `node-red/data/flows_cred.json`, `node-red/data/node_modules/`, and `grafana/data/` are local runtime state and should not be committed.
 
 ## First-Time Setup
@@ -27,6 +29,15 @@ docker-compose ps
 docker-compose logs -f grafana
 docker-compose logs -f nodered
 ```
+
+5. Open Node-RED and Grafana to confirm the shared source files loaded correctly:
+
+```text
+Node-RED: http://localhost:1880
+Grafana: http://localhost:3000
+```
+
+The first boot should use the committed Node-RED flow and the provisioned PostgreSQL dashboard, not a local UI-only setup.
 
 ## What To Commit
 
@@ -62,22 +73,17 @@ docker-compose logs -f nodered
 
 - Use Grafana at `http://localhost:3000`.
 - Shared dashboards belong in `grafana/provisioning/dashboards/`.
+- The current shared dashboard file is `grafana/provisioning/dashboards/api-postgres-dashboard.json`.
 - Local UI state under `grafana/data/` is intentionally non-shareable.
 - If you want to update the shared dashboard, export the dashboard JSON and replace the provisioned file in `grafana/provisioning/dashboards/`.
 
 ## Published Image Workflow
 
-Compose currently runs these services from published images:
-
-- `parilpaladiya/alert-manager:1.1`
-- `parilpaladiya/alert-api:1.2`
-- `parilpaladiya/data-generator:1.1`
+Compose runs `alert-manager` and `alert-api` from published images, and `data-generator` from its published image.
 
 When source changes in those folders need to be shared:
 
-1. Rebuild the image locally.
-2. Push the image to the registry.
-3. Update the image tag in `docker-compose.yaml`.
+1. For `alert-manager`, `alert-api`, and `data-generator`, rebuild and republish the image if its code changes.
 
 Example:
 
@@ -92,5 +98,5 @@ docker build -t <registry>/data-generator:<tag> ./data-generator
 - `docker-compose up -d` starts cleanly.
 - `docker-compose ps` shows PostgreSQL healthy.
 - Node-RED flows are reflected in `node-red/data/flows.json`.
-- Grafana shareable changes are reflected in `grafana/provisioning/`.
+- Grafana shareable changes are reflected in `grafana/provisioning/`, especially `grafana/provisioning/dashboards/api-postgres-dashboard.json`.
 - No local runtime state was accidentally added to the commit.

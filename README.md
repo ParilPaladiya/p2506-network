@@ -6,10 +6,10 @@ Docker Compose-based IoT monitoring setup with MQTT ingestion, PostgreSQL storag
 
 - MQTT broker with Mosquitto
 - PostgreSQL database with bootstrap schema
-- Node-RED flow that stores raw sensor data
+- Node-RED flow that stores raw sensor data and is tracked in `node-red/data/flows.json`
 - Alert manager that classifies readings and stores alerts
 - Alert API for querying alert history
-- Grafana datasources and a shared dashboard
+- Grafana datasources and a shared dashboard provisioned from `grafana/provisioning/`
 
 ## Architecture
 
@@ -137,23 +137,24 @@ Do not use local runtime state as the shareable version of the project.
 ## Grafana
 
 - Shared Grafana assets live in `grafana/provisioning/`.
-- The shared dashboard file is provisioned from `grafana/provisioning/dashboards/`.
-- The provisioning config keeps the dashboard file managed so contributors all start from the same version.
+- The shared dashboard file is `grafana/provisioning/dashboards/api-postgres-dashboard.json`.
+- The provisioning config keeps the dashboard file managed so contributors all start from the same PostgreSQL dashboard and datasource setup.
 - If you want to update the shared dashboard, export the dashboard JSON and replace the provisioned file.
 
 ## Node-RED
 
 - The tracked flow file is `node-red/data/flows.json`.
+- It is preconfigured for MQTT ingestion and inserts into PostgreSQL `temperature_data`.
 - Deploy from the Node-RED UI after edits so the file is updated.
 - Credentials are intentionally not shared.
 
 ## Image Strategy
 
-`alert-manager`, `alert-api`, and `data-generator` are run from published Docker images in Compose.
+`alert-manager` and `alert-api` are run from published images in Compose.
 
-- This makes cloning and startup easier for contributors.
-- Their local source folders remain the editable source of truth.
-- If those services change, rebuild and republish the image, then update the tag in `docker-compose.yaml`.
+- Current tags: `parilpaladiya/alert-manager:1.2` and `parilpaladiya/alert-api:1.3`
+- `data-generator` still uses the published image.
+- Rebuild and republish only when the service source changes.
 
 Example:
 

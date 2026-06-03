@@ -12,6 +12,8 @@ Use this repository as the single source of truth for:
 - Grafana provisioning
 - source code for services that may later be rebuilt and republished
 
+For a fresh clone, the default startup state should match the committed Node-RED flow in `node-red/data/flows.json` and the committed Grafana dashboard in `grafana/provisioning/dashboards/api-postgres-dashboard.json`.
+
 Do not use your live local runtime folders as the source of truth.
 
 ## What Contributors Should Receive
@@ -48,6 +50,7 @@ For the easiest onboarding flow:
 ### Grafana
 
 - `grafana/provisioning/` is shareable.
+- `grafana/provisioning/dashboards/api-postgres-dashboard.json` is the current shared dashboard.
 - `grafana/data/` is local state only.
 - Avoid relying on UI-only dashboard changes.
 - File-provisioned dashboards should be updated by exporting JSON back into `grafana/provisioning/dashboards/`.
@@ -55,6 +58,7 @@ For the easiest onboarding flow:
 ### Node-RED
 
 - `node-red/data/flows.json` is shareable.
+- It should represent the same MQTT-to-PostgreSQL flow that is present after a clean startup.
 - `node-red/data/flows_cred.json` is local encrypted credential state.
 - `node-red/data/node_modules/` is local installed runtime state.
 - `node-red/data/package.json` and `package-lock.json` describe shareable Node-RED dependencies.
@@ -64,8 +68,8 @@ For the easiest onboarding flow:
 - Ensure `.env` is ignored and `.env.example` is present.
 - Ensure `grafana/data/` is ignored.
 - Ensure `node-red/data/flows_cred.json` and `node-red/data/node_modules/` are ignored.
-- Ensure the shared Grafana dashboard JSON matches the intended final dashboard.
-- Ensure the tracked Node-RED flow file matches the intended final flow.
+- Ensure the shared Grafana dashboard JSON matches the intended PostgreSQL dashboard.
+- Ensure the tracked Node-RED flow file matches the intended MQTT-to-PostgreSQL flow.
 - Ensure `README.md` matches the current service ports and image tags.
 
 ## If You Want Contributors To See Exactly Your Current UI

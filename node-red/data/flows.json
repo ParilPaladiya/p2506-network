@@ -35,27 +35,6 @@
         "sessionExpiry": ""
     },
     {
-        "id": "postgres-config",
-        "type": "postgreSQLConfig",
-        "name": "sensor_db (Docker)",
-        "host": "postgres",
-        "hostFieldType": "str",
-        "port": "5432",
-        "portFieldType": "num",
-        "database": "sensor_db",
-        "databaseFieldType": "str",
-        "ssl": "false",
-        "sslFieldType": "bool",
-        "max": "10",
-        "maxFieldType": "num",
-        "idle": "1000",
-        "idleFieldType": "num",
-        "connectionTimeout": "10000",
-        "connectionTimeoutFieldType": "num",
-        "user": "postgres",
-        "userFieldType": "str"
-    },
-    {
         "id": "mqtt-in-node",
         "type": "mqtt in",
         "z": "flow1",
@@ -75,6 +54,29 @@
                 "function-node"
             ]
         ]
+    },
+    {
+        "id": "postgres-config",
+        "type": "postgreSQLConfig",
+        "name": "sensor_db (Docker)",
+        "host": "postgres",
+        "hostFieldType": "str",
+        "port": "5432",
+        "portFieldType": "num",
+        "database": "sensor_db",
+        "databaseFieldType": "str",
+        "ssl": "false",
+        "sslFieldType": "bool",
+        "max": "10",
+        "maxFieldType": "num",
+        "idle": "1000",
+        "idleFieldType": "num",
+        "connectionTimeout": "10000",
+        "connectionTimeoutFieldType": "num",
+        "user": "postgres",
+        "userFieldType": "str",
+        "password": "POSTGRES_PASSWORD",
+        "passwordFieldType": "env"
     },
     {
         "id": "function-node",

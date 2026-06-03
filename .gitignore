@@ -10,7 +10,9 @@ __pycache__/
 
 # Node-RED runtime state
 node-red/data/.npm/
+node-red/data/lib/
 node-red/data/.config.nodes.json.backup
+node-red/data/.config.nodes.json
 node-red/data/.config.runtime.json
 node-red/data/.config.runtime.json.backup
 node-red/data/.config.users.json
@@ -22,5 +24,4 @@ node-red/data/flows_cred.json
 node-red/data/node_modules/
 
 # Grafana runtime state
-grafana/data/*
-!grafana/data/.gitkeep
+grafana/data/
